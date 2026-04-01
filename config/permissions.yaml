@@ -1,0 +1,8 @@
+interAgentCommunication:
+  enabled: false # Global kill switch
+  allowedPairs: []
+  # Example:
+  # - source: "obsidian-agent"
+  #   target: "calendar-agent"
+  #   actions: ["calendar.check-availability"]
+  #   requireConfirmation: true

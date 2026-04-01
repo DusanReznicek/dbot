@@ -1,0 +1,15 @@
+# Development overrides
+# Merged on top of default.yaml when NODE_ENV=development
+
+llm:
+  defaultProvider: "mistral"
+
+messageBus:
+  type: "in-memory"
+
+logging:
+  level: "debug"
+
+channels:
+  whatsapp:
+    enabled: false

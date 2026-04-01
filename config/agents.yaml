@@ -1,0 +1,12 @@
+agents:
+  - id: "obsidian-agent"
+    enabled: true
+    config:
+      vaultPath: "./data/vault"
+      syncEnabled: true
+      defaultFolder: "/"
+      taskFile: "tasks.md"
+      dailyNotesFolder: "daily"
+      excludePatterns:
+        - ".obsidian/**"
+        - ".trash/**"

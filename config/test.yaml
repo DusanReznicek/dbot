@@ -1,0 +1,15 @@
+# Test overrides
+# Merged on top of default.yaml when NODE_ENV=test
+
+llm:
+  defaultProvider: "mistral"
+
+messageBus:
+  type: "in-memory"
+
+logging:
+  level: "warn"
+
+channels:
+  whatsapp:
+    enabled: false

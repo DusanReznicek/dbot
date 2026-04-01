@@ -1,0 +1,7 @@
+skills:
+  file-system:
+    enabled: false # Enable when implemented (Phase 5)
+  markdown-parser:
+    enabled: false
+  obsidian-sync:
+    enabled: false

@@ -1,0 +1,35 @@
+{
+  "id": "obsidian-sync",
+  "name": "Obsidian Sync",
+  "version": "2.0.0",
+  "description": "Obsidian vault sync status — sync runs via obsidian-headless CLI in a separate container (ob sync --continuous)",
+  "actions": [
+    {
+      "name": "sync",
+      "description": "Check sync status (sync runs continuously in obsidian-sync container)",
+      "parameters": [],
+      "returns": "SyncResult"
+    },
+    {
+      "name": "getStatus",
+      "description": "Get vault and sync container status",
+      "parameters": [],
+      "returns": "SyncStatus"
+    },
+    {
+      "name": "getLastSyncTime",
+      "description": "Get timestamp of last successful sync check",
+      "parameters": [],
+      "returns": "number"
+    }
+  ],
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "vaultPath": { "type": "string", "description": "Path to the vault directory" },
+      "enabled": { "type": "boolean", "default": true }
+    },
+    "required": []
+  },
+  "permissions": ["filesystem.read"]
+}

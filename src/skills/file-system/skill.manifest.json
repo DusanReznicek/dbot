@@ -1,0 +1,67 @@
+{
+  "id": "file-system",
+  "name": "File System",
+  "version": "1.0.0",
+  "description": "File system operations for reading, writing, and managing files within a sandboxed directory",
+  "actions": [
+    {
+      "name": "read",
+      "description": "Read file contents",
+      "parameters": [
+        { "name": "path", "type": "string", "description": "Relative file path", "required": true }
+      ],
+      "returns": "string"
+    },
+    {
+      "name": "write",
+      "description": "Write content to a file (creates directories if needed)",
+      "parameters": [
+        { "name": "path", "type": "string", "description": "Relative file path", "required": true },
+        { "name": "content", "type": "string", "description": "File content", "required": true }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "append",
+      "description": "Append content to an existing file",
+      "parameters": [
+        { "name": "path", "type": "string", "description": "Relative file path", "required": true },
+        { "name": "content", "type": "string", "description": "Content to append", "required": true }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "delete",
+      "description": "Delete a file",
+      "parameters": [
+        { "name": "path", "type": "string", "description": "Relative file path", "required": true }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "list",
+      "description": "List files and directories",
+      "parameters": [
+        { "name": "dir", "type": "string", "description": "Relative directory path", "required": false, "default": "/" },
+        { "name": "pattern", "type": "string", "description": "Glob pattern filter", "required": false }
+      ],
+      "returns": "string[]"
+    },
+    {
+      "name": "exists",
+      "description": "Check if a file or directory exists",
+      "parameters": [
+        { "name": "path", "type": "string", "description": "Relative path", "required": true }
+      ],
+      "returns": "boolean"
+    }
+  ],
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "basePath": { "type": "string", "description": "Root directory for all operations (sandbox)" }
+    },
+    "required": ["basePath"]
+  },
+  "permissions": ["filesystem.read", "filesystem.write"]
+}

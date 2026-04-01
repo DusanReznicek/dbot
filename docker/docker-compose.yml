@@ -1,0 +1,89 @@
+services:
+  dbot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: dbot
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DBOT__MESSAGE_BUS__TYPE=redis
+      - DBOT__MESSAGE_BUS__REDIS__HOST=redis
+      - DBOT__MESSAGE_BUS__REDIS__PORT=6379
+      - DBOT_VAULT_PATH=/vault
+    volumes:
+      - vault-data:/vault
+      - ../config:/app/config:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - dbot-network
+
+  dbot-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: dbot-dev
+    env_file:
+      - ../.env
+    profiles:
+      - dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DBOT_VAULT_PATH=/vault
+    volumes:
+      - ../src:/app/src
+      - ../config:/app/config
+      - vault-data:/vault
+      - ../tsconfig.json:/app/tsconfig.json
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - dbot-network
+
+  obsidian-sync:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.sync
+    container_name: dbot-obsidian-sync
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    volumes:
+      - vault-data:/vault
+      - obsidian-auth:/root/.config/obsidian-headless
+    networks:
+      - dbot-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: dbot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - dbot-network
+
+volumes:
+  redis-data:
+  vault-data:
+  obsidian-auth:
+
+networks:
+  dbot-network:
+    driver: bridge

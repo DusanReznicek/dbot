@@ -1,0 +1,58 @@
+server:
+  port: 3000
+  host: "0.0.0.0"
+
+llm:
+  defaultProvider: "mistral"
+  providers:
+    openai:
+      model: "gpt-4o"
+      # apiKey from env: OPENAI_API_KEY
+    anthropic:
+      model: "claude-sonnet-4-20250514"
+      # apiKey from env: ANTHROPIC_API_KEY
+    ollama:
+      model: "llama3.1"
+      baseUrl: "http://localhost:11434"
+      keepAlive: "5m"
+      timeout: 120000
+    mistral:
+      model: "mistral-large-latest"
+      # apiKey from env: MISTRAL_API_KEY
+
+messageBus:
+  type: "in-memory"
+  redis:
+    host: "localhost"
+    port: 6379
+
+logging:
+  level: "info"
+
+channels:
+  whatsapp:
+    enabled: true
+    authMethod: "qr"
+    authStateDir: "./data/whatsapp-auth"
+    allowedContacts: []
+    allowSelf: true
+    readMessages: true
+    typingIndicator: true
+    maxMessageLength: 4096
+    reconnectInterval: 5000
+    maxReconnectAttempts: 10
+
+  restApi:
+    enabled: true
+
+  cli:
+    enabled: false
+
+  telegram:
+    enabled: true
+    botToken: ""
+    allowedChatIds: []
+    allowGroups: false
+    typingIndicator: true
+    maxMessageLength: 4096
+    rateLimitPerChat: 10

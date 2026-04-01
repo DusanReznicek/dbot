@@ -1,0 +1,63 @@
+{
+  "id": "markdown-parser",
+  "name": "Markdown Parser",
+  "version": "1.0.0",
+  "description": "Parse and manipulate Markdown content with YAML frontmatter, wikilinks, and tags",
+  "actions": [
+    {
+      "name": "parse",
+      "description": "Parse markdown into structured components (frontmatter, body, links, tags)",
+      "parameters": [
+        { "name": "content", "type": "string", "description": "Raw markdown content", "required": true }
+      ],
+      "returns": "ParsedMarkdown"
+    },
+    {
+      "name": "stringify",
+      "description": "Convert structured components back to markdown string",
+      "parameters": [
+        { "name": "body", "type": "string", "description": "Markdown body", "required": true },
+        { "name": "frontmatter", "type": "object", "description": "YAML frontmatter data", "required": false }
+      ],
+      "returns": "string"
+    },
+    {
+      "name": "getFrontmatter",
+      "description": "Extract YAML frontmatter from markdown",
+      "parameters": [
+        { "name": "content", "type": "string", "description": "Raw markdown content", "required": true }
+      ],
+      "returns": "object"
+    },
+    {
+      "name": "setFrontmatter",
+      "description": "Update or set YAML frontmatter in markdown",
+      "parameters": [
+        { "name": "content", "type": "string", "description": "Raw markdown content", "required": true },
+        { "name": "data", "type": "object", "description": "Frontmatter key-value pairs to set/merge", "required": true }
+      ],
+      "returns": "string"
+    },
+    {
+      "name": "extractLinks",
+      "description": "Extract all links (wikilinks and markdown links)",
+      "parameters": [
+        { "name": "content", "type": "string", "description": "Raw markdown content", "required": true }
+      ],
+      "returns": "Link[]"
+    },
+    {
+      "name": "extractTags",
+      "description": "Extract all #tags from content and frontmatter",
+      "parameters": [
+        { "name": "content", "type": "string", "description": "Raw markdown content", "required": true }
+      ],
+      "returns": "string[]"
+    }
+  ],
+  "configSchema": {
+    "type": "object",
+    "properties": {}
+  },
+  "permissions": []
+}

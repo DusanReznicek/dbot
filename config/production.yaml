@@ -1,0 +1,20 @@
+# Production overrides
+# Merged on top of default.yaml when NODE_ENV=production
+
+llm:
+  defaultProvider: "mistral"
+
+messageBus:
+  type: "redis"
+  redis:
+    host: "redis"
+    port: 6379
+
+logging:
+  level: "warn"
+
+channels:
+  whatsapp:
+    enabled: true
+    reconnectInterval: 10000
+    maxReconnectAttempts: 20
