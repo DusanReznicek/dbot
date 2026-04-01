@@ -11,6 +11,7 @@ import { createLogger } from '../core/utils/logger.js';
 import { AgentError } from '../core/utils/errors.js';
 import { IntentRouter } from './intent-router.js';
 import { ConversationContext } from './conversation-context.js';
+import { resolveTemplate } from './prompt-template.js';
 
 const logger = createLogger('MasterAgent');
 
@@ -26,6 +27,7 @@ export class MasterAgent implements IMasterAgent {
   private permissionManager?: IPermissionManager;
   private confirmationHandler?: ConfirmationHandler;
   private pendingConfirmations = new Map<string, { message: AgentMessage; rule: PermissionRule }>();
+  private fallbackResponseTemplate?: string;
 
   constructor(messageBus: IMessageBus) {
     this.messageBus = messageBus;
@@ -85,6 +87,23 @@ export class MasterAgent implements IMasterAgent {
       'User denied inter-agent message',
     );
     return false;
+  }
+
+  /**
+   * Set a meta prompt that influences intent routing behavior.
+   * Supports template variables: {{date}}, {{agents}}, {{agentNames}}, {{capabilities}}.
+   */
+  setMetaPrompt(prompt: string | undefined): void {
+    this.intentRouter.setMetaPrompt(prompt);
+    logger.info({ hasMetaPrompt: !!prompt }, 'Meta prompt configured on Master Agent');
+  }
+
+  /**
+   * Set a template for the fallback response when no agent matches.
+   * Supports {{message}} variable for the original user message.
+   */
+  setFallbackResponseTemplate(template: string | undefined): void {
+    this.fallbackResponseTemplate = template;
   }
 
   /**
@@ -193,12 +212,16 @@ export class MasterAgent implements IMasterAgent {
   }
 
   private createFallbackResponse(message: UserMessage, conversationId: string): AgentResponse {
+    const text = this.fallbackResponseTemplate
+      ? resolveTemplate(this.fallbackResponseTemplate, { message: message.content })
+      : `Přijal jsem zprávu: "${message.content}". Zatím nemám agenta, který by ji zpracoval.`;
+
     return {
       id: randomUUID(),
       timestamp: Date.now(),
       agentId: this.id,
       conversationId,
-      text: `Přijal jsem zprávu: "${message.content}". Zatím nemám agenta, který by ji zpracoval.`,
+      text,
     };
   }
 

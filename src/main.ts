@@ -68,6 +68,14 @@ async function main(): Promise<void> {
   } else {
     logger.warn('No LLM provider available — using hardcoded intent routing');
   }
+
+  // Configure meta prompt (if set in config)
+  if (config.masterAgent.metaPrompt) {
+    masterAgent.setMetaPrompt(config.masterAgent.metaPrompt as string);
+  }
+  if (config.masterAgent.fallbackResponse) {
+    masterAgent.setFallbackResponseTemplate(config.masterAgent.fallbackResponse);
+  }
   // 5b. Initialize Permission Manager
   const permissionManager = new PermissionManager();
   permissionManager.loadFromFile(resolve('config/permissions.yaml'));

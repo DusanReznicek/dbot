@@ -68,6 +68,24 @@ function applyEnvOverrides(config: Record<string, unknown>): Record<string, unkn
   return result;
 }
 
+function resolvePromptFiles(config: Record<string, unknown>, configDir: string): Record<string, unknown> {
+  const masterAgent = config.masterAgent as Record<string, unknown> | undefined;
+  if (
+    masterAgent?.metaPrompt &&
+    typeof masterAgent.metaPrompt === 'object' &&
+    !Array.isArray(masterAgent.metaPrompt) &&
+    'file' in (masterAgent.metaPrompt as Record<string, unknown>)
+  ) {
+    const filePath = resolve(configDir, (masterAgent.metaPrompt as { file: string }).file);
+    if (existsSync(filePath)) {
+      masterAgent.metaPrompt = readFileSync(filePath, 'utf-8');
+    } else {
+      delete masterAgent.metaPrompt;
+    }
+  }
+  return config;
+}
+
 export function loadConfig(configDir?: string): AppConfig {
   const dir = configDir || resolve(process.cwd(), 'config');
   const nodeEnv = process.env.NODE_ENV || 'development';
@@ -81,6 +99,9 @@ export function loadConfig(configDir?: string): AppConfig {
 
   // Layer 3: environment variables (highest priority)
   config = applyEnvOverrides(config);
+
+  // Resolve file references in prompt configs
+  config = resolvePromptFiles(config, dir);
 
   // Validate with zod
   return configSchema.parse(config);

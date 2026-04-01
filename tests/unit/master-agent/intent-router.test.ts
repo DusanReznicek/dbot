@@ -222,6 +222,64 @@ describe('IntentRouter', () => {
     expect(result.action).toBe('obsidian.write');
   });
 
+  // ---- Meta prompt ----
+
+  it('prepends meta prompt to system prompt when set', async () => {
+    registry.register(
+      createMockAgent('obsidian-agent', ['obsidian.read', 'obsidian.write']),
+    );
+
+    const llm = createMockLLMProvider({
+      content: '{"agentId": "obsidian-agent", "action": "obsidian.write", "confidence": 0.9}',
+    });
+    router.setLLMProvider(llm);
+    router.setMetaPrompt('You are a Czech assistant named DBot.');
+
+    await router.route('Vytvoř poznámku');
+
+    const chatCall = (llm.chat as ReturnType<typeof vi.fn>).mock.calls[0];
+    const systemPrompt = chatCall[1].systemPrompt as string;
+    expect(systemPrompt).toMatch(/^You are a Czech assistant named DBot\.\n\n/);
+    expect(systemPrompt).toContain('intent classifier');
+  });
+
+  it('does not prepend anything when meta prompt is not set', async () => {
+    registry.register(
+      createMockAgent('obsidian-agent', ['obsidian.read', 'obsidian.write']),
+    );
+
+    const llm = createMockLLMProvider({
+      content: '{"agentId": "obsidian-agent", "action": "obsidian.write", "confidence": 0.9}',
+    });
+    router.setLLMProvider(llm);
+
+    await router.route('Vytvoř poznámku');
+
+    const chatCall = (llm.chat as ReturnType<typeof vi.fn>).mock.calls[0];
+    const systemPrompt = chatCall[1].systemPrompt as string;
+    expect(systemPrompt).toMatch(/^You are an intent classifier/);
+  });
+
+  it('resolves template variables in meta prompt', async () => {
+    registry.register(
+      createMockAgent('obsidian-agent', ['obsidian.read', 'obsidian.write']),
+    );
+
+    const llm = createMockLLMProvider({
+      content: '{"agentId": "obsidian-agent", "action": "obsidian.write", "confidence": 0.9}',
+    });
+    router.setLLMProvider(llm);
+    router.setMetaPrompt('Today: {{date}}. Agents: {{agentNames}}.');
+
+    await router.route('Test');
+
+    const chatCall = (llm.chat as ReturnType<typeof vi.fn>).mock.calls[0];
+    const systemPrompt = chatCall[1].systemPrompt as string;
+    const today = new Date().toISOString().split('T')[0];
+    expect(systemPrompt).toContain(`Today: ${today}`);
+    expect(systemPrompt).toContain('Agents: Test obsidian-agent');
+  });
+
   it('handles LLM response with code fences', async () => {
     registry.register(
       createMockAgent('obsidian-agent', ['obsidian.read', 'obsidian.write']),

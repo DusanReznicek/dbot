@@ -79,6 +79,16 @@ export const channelsSchema = z.object({
   telegram: telegramChannelSchema.default({}),
 });
 
+export const metaPromptSourceSchema = z.union([
+  z.string(),
+  z.object({ file: z.string() }),
+]);
+
+export const masterAgentSchema = z.object({
+  metaPrompt: metaPromptSourceSchema.optional(),
+  fallbackResponse: z.string().optional(),
+});
+
 export const configSchema = z.object({
   server: serverSchema.default({}),
   llm: llmSchema.default({
@@ -93,6 +103,7 @@ export const configSchema = z.object({
   messageBus: messageBusSchema.default({}),
   logging: loggingSchema.default({}),
   channels: channelsSchema.default({}),
+  masterAgent: masterAgentSchema.default({}),
 });
 
 export type AppConfig = z.infer<typeof configSchema>;
@@ -103,3 +114,4 @@ export type LoggingConfig = z.infer<typeof loggingSchema>;
 export type ChannelsConfig = z.infer<typeof channelsSchema>;
 export type WhatsAppChannelConfig = z.infer<typeof whatsappChannelSchema>;
 export type TelegramChannelConfig = z.infer<typeof telegramChannelSchema>;
+export type MasterAgentConfig = z.infer<typeof masterAgentSchema>;

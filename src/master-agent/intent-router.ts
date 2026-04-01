@@ -1,6 +1,7 @@
 import type { AgentRegistry } from '../core/registry/agent.registry.js';
 import type { ILLMProvider } from '../core/interfaces/llm.interface.js';
 import { createLogger } from '../core/utils/logger.js';
+import { resolveTemplate } from './prompt-template.js';
 
 const logger = createLogger('IntentRouter');
 
@@ -20,8 +21,16 @@ const KEYWORD_MAP: Array<{ keywords: string[]; capability: string }> = [
 
 export class IntentRouter {
   private llmProvider: ILLMProvider | null = null;
+  private metaPrompt: string | undefined;
 
   constructor(private agentRegistry: AgentRegistry) {}
+
+  setMetaPrompt(prompt: string | undefined): void {
+    this.metaPrompt = prompt;
+    if (prompt) {
+      logger.info({ length: prompt.length }, 'Meta prompt set on intent router');
+    }
+  }
 
   setLLMProvider(provider: ILLMProvider): void {
     this.llmProvider = provider;
@@ -59,7 +68,7 @@ export class IntentRouter {
       capabilities: a.capabilities,
     }));
 
-    const systemPrompt = `You are an intent classifier for a personal AI assistant.
+    const routingPrompt = `You are an intent classifier for a personal AI assistant.
 Given a user message, determine which agent should handle it.
 
 Available agents:
@@ -77,6 +86,18 @@ Rules:
 - "obsidian.daily" = writing to today's daily note / logging (e.g. "Zapiš", "Daily note")
 - "obsidian.write" = creating a completely new standalone note
 - "obsidian.edit" = editing an existing note`;
+
+    // Prepend meta prompt if configured
+    let systemPrompt: string;
+    if (this.metaPrompt) {
+      const resolvedMeta = resolveTemplate(this.metaPrompt, {
+        agents: agentDescriptions,
+        date: new Date().toISOString().split('T')[0],
+      });
+      systemPrompt = `${resolvedMeta}\n\n${routingPrompt}`;
+    } else {
+      systemPrompt = routingPrompt;
+    }
 
     const response = await this.llmProvider!.chat(
       [{ role: 'user', content: text }],

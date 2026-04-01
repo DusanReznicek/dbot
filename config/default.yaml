@@ -29,6 +29,16 @@ messageBus:
 logging:
   level: "info"
 
+# masterAgent:
+#   metaPrompt: |
+#     Jsi DBot, osobní AI asistent hovořící česky.
+#     Dnešní datum je {{date}}.
+#     Pomáháš spravovat poznámky, úkoly a denní záznamy v Obsidian vaultu.
+#   fallbackResponse: "Přijal jsem zprávu: \"{{message}}\". Zatím nemám agenta, který by ji zpracoval."
+#   # Alternatively, load meta prompt from a file:
+#   # metaPrompt:
+#   #   file: "meta-prompt.md"
+
 channels:
   whatsapp:
     enabled: true

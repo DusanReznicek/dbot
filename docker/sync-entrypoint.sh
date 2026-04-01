@@ -32,6 +32,7 @@ SYNC_INTERVAL="${OBSIDIAN_SYNC_INTERVAL:-30}"
 echo "[sync-entrypoint] Starting periodic sync (every ${SYNC_INTERVAL}s)..."
 
 while true; do
+  rmdir /vault/.obsidian/.sync.lock 2>/dev/null || true
   ob sync 2>&1 || echo "[sync-entrypoint] Sync error, will retry..."
   sleep "$SYNC_INTERVAL"
 done
